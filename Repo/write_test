@@ -1,0 +1,42 @@
+import curses
+import csv
+import time
+import random
+import os
+import logging
+import tweepy
+import pyautogui
+import yaml
+import pyperclip
+#import pyYAML
+from curses import wrapper
+from selenium import webdriver
+from datetime import datetime, timedelta
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+
+
+# function to contain the global variable for twitter_link
+def twitter_link():
+    global twitter_link
+    twitter_link = pyperclip.paste()
+    return str(twitter_link)
+
+upload = "upload"
+post = "post"
+filename = "output.csv"
+timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+#twitter_link = pyperclip.paste()
+
+toWrite = [timestamp, upload, post, twitter_link()]
+with open(filename, 'a') as f:
+    writer = csv.writer(f)
+    writer.writerow(toWrite)
+    print(f"Activity recorded in {filename}")
+print("Twitter module completed")
