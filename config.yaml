@@ -1,0 +1,27 @@
+# ------------- Twitter Keys ------------- #
+red_username: "winterblueart"
+red_password: "Showcase2017!"
+upload: []
+post: "post"
+
+# ------------- Reddit Keys ------------- #
+red_username: "winterblueart"
+red_password: "Showcase2017!"
+
+# Title [gender/gender] (winterblueart)
+red_title: ""
+
+# y/n
+NSFW: "y"
+
+sub_list:                   # All furry
+    r/BreadTapedToTrees: 1  # General nsfw
+    r/Footpaws: 2           # Paw-related
+    r/furry_catwalk: 3      # General
+    r/FurryCommissions: 4   # General commissions
+    r/furryporn: 5          # General nsfw
+    r/gfur: 6               # Gay nsfw
+    r/FurrySoftcore: 7      # Softcore nsfw
+    r/yiff: 8               # Multi-character nsfw
+
+choice: []
