@@ -20,6 +20,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import NoSuchElementException
 
 import pyfiglet
 from pyfiglet import figlet_format
@@ -79,21 +80,22 @@ def gui(stdscr):
     print_dots()
    
     stdscr.addstr(12,0,"Please select One of the following Options:", curses.A_REVERSE)
-    stdscr.addstr(13,0,"Art Post [1]")
-    stdscr.addstr(14,0,"")	
+    stdscr.addstr(13,0,"Twitter > Reddit [1]")
+    stdscr.addstr(14,0,"Twitter [2]")
+    stdscr.addstr(15,0,"")
 
     while True:
         key = stdscr.getkey()
         if key == "1":
-            stdscr.addstr(15,0,"Art Post Selected")
+            stdscr.addstr(16,0,"Art Post Selected")
             print_dots()
             break
         else:
-            stdscr.addstr(15,0,"None")
+            stdscr.addstr(16,0,"None")
             break
 
-    if key == "1":
-        stdscr.addstr(16,0,"Press any key to continue")
+    if key == range(1,2):
+        stdscr.addstr(17,0,"Press any key to continue")
 
     stdscr.refresh()
     time.sleep(2)
@@ -106,6 +108,8 @@ def relay_choice(key):
         TwitterBot()
         ImgurBot()
         RedditBot()
+    if key == '2':
+        TwitterBot()
 
 # Set options for the web browser driver
 def browser_options():
@@ -154,7 +158,7 @@ class TwitterClass:
         self.browser = launch_driver()
         self.wait = WebDriverWait(self.browser, 30)
         self.start_twitter(username, password)
-        self.post_twitter(upload, post)
+        # self.post_twitter(upload, post)
         twitter_link = self.twitter_link()
         self.write_to_file(upload, post, twitter_link)
 
@@ -227,12 +231,12 @@ class TwitterClass:
                 log.info("Text-only post submitted")
 
             time.sleep(5)
-            upload_tweet_bttn.click()
+            # upload_tweet_bttn.click()
         except TimeoutException:
             log.info(
                 "TimeoutException! Upload data or Twitter buttons not found"
                 )
-        upload_tweet_bttn.click()
+
 
     # Get the link to the tweet just sent
     def twitter_link(self):
@@ -290,8 +294,8 @@ class TwitterClass:
         with open(filename, 'a') as f:
             writer = csv.writer(f)
             writer.writerow(toWrite)
-            info.log(f"Activity recorded in {filename}")
-        info.log("Twitter module completed")
+            log.info(f"Activity recorded in {filename}")
+        log.info("Twitter module completed")
 
 class ImgurClass:
 
@@ -312,13 +316,13 @@ class ImgurClass:
         log.info("Logging in.....Please wait")
         self.browser.get("https://imgur.com/upload")
         log.info("Waiting for elements to load... ")
-        pghold
+        time.sleep(random.uniform(1.5,2.5))
         # Navigate Imgur DOM
         try:
             upload_button = self.browser.find_element(By.XPATH,
                 "//input[@id='file-input']"
                 )
-            pghold
+            time.sleep(random.uniform(1.5,2.5))
             upload_button.send_keys(upload)
             time.sleep(12) ##until loaded
             drop_down = self.browser.find_element(By.XPATH,
@@ -342,7 +346,7 @@ class ImgurClass:
             job = data.replace('[/img]','').replace('[img]', '')  
             dataY = dict(img_link = job)
             
-            with open('imgur.yaml', 'a') as outfile:
+            with open('imgur.yaml', 'w') as outfile:
                 yaml.dump(dataY, outfile, default_flow_style=False)
 
             log.info("Imgur module completed")
@@ -383,9 +387,19 @@ class RedditClass:
         try:
             log.info("Logging in.....Please wait")
             self.browser.get("https://www.reddit.com/login/")
+            avoid_lock()
             log.info("Waiting for elements to load... ")
             time.sleep(random.uniform(1.5,2.5))
-            username_box = tweets = self.browser.find_element(By.XPATH,
+            
+            # Reddit's JavaScript is buggy, clicking this link and then going back fixes issue
+            glitch_fix = tweets = self.browser.find_element(By.XPATH,
+                "//a[@class='BottomLink']"
+                )
+            glitch_fix.click()
+            self.browser.back()
+            time.sleep(random.uniform(1.5,2.5))
+
+            username_box = self.browser.find_element(By.XPATH,
                 "//input[@id='loginUsername']"
                 )
             password_box = self.browser.find_element(By.XPATH,
@@ -399,7 +413,20 @@ class RedditClass:
             time.sleep(random.uniform(1.5,2.5))
             password_box.click()
             password_box.send_keys(red_password)
+            time.sleep(random.uniform(1.5,2.5))
             login_buttn.click()
+
+            # If the site JavaScript is still stuck, reload the loop (and page)
+            elem = WebDriverWait(self.browser, 100).until(
+                      EC.presence_of_element_located((By.XPATH, "//input[@type='search']"))
+                      )
+
+            while True:    
+                if not elem:
+                    log.debug("Reddit log-in reload executed")
+                    continue
+                else:
+                    break
             
         except TimeoutException:
             log.info(
@@ -438,6 +465,7 @@ class RedditClass:
         # lock out test
         avoid_lock()
         log.info("Lock avoided.")
+        self.browser.refresh()
 
         # Start loop
         for subs in sub_choice:
@@ -452,16 +480,26 @@ class RedditClass:
                 red_search.click()
 
                 ##REPLACE time.sleep with wait until loaded later
-                ##MAKE SURE safe search is turned off; add in later
-
                 time.sleep(random.uniform(1.5,2.5))
                 
                 red_search.send_keys(Keys.ENTER)
                 time.sleep(random.uniform(1.5,2.5)) 
 
+                #Toggle safe search button for proper results
+                try:
+                    safe_search = self.browser.find_element(By.XPATH,
+                            "//button[@id='safe-search-toggle']"
+                            )
+                    safe_search.click()
+                except NoSuchElementException:
+                    log.error("Safe search button could not be verified. Closing system")
+                    break
+
+                ##CHANGE to unitl.loaded later on (the list doesn't update very fast)
+                time.sleep(random.uniform(3,5))
                 # Subreddit name (sub_list)
                 sub_name = self.browser.find_element(By.XPATH, 
-                        "//h6[contains(., " +subs+ ")]" 
+                        "//h6[contains(., '" +subs+ "')]" 
                         )
                 sub_name.click()
                 time.sleep(random.uniform(1.5,2.5))
@@ -522,22 +560,27 @@ class RedditClass:
                         "//div[@aria-label='flair_picker']/div[@aria-checked='false']"
                         )
                 
+                flair_picked = False
                 for element in flair_menu:
                     try:
-                        flair = element.find_element(By.XPATH,"//div[@role='radiogroup']/div[" +flair_key+"]") 
+                        log.debug("//div[@role='radiogroup']/div[" +flair_key+"]")
+                        flair = self.browser.find_element(By.XPATH,"//div[@role='radiogroup']/div[" +flair_key+"]") 
                         clicked = flair.click()
+                        flair_picked = True
                         if clicked:
                             log.info(f"Inserted flair: {flair}")
                     except NoSuchElementException:
-                        log.error("Flair tag cannot be found")
-                        pass
-                        
-                apply_bttn = self.browser.find_element(By.XPATH,
+                        log.error("Flair tag cannot be found") 
+                        time.sleep(3)
+                        webdriver.ActionChains(self.browser).send_keys(Keys.ESCAPE).perform()
+
+                if flair_picked == True:
+                    apply_bttn = self.browser.find_element(By.XPATH,
                         "//button[contains(., 'Apply')]"
                         )
-                apply_bttn.click()
+                    apply_bttn.click()
 
-                submit_bttn = self.browser.find_elements(By.XPATH,
+                submit_bttn = self.browser.find_element(By.XPATH,
                         "//button[@role='button'][contains(., 'Post')]"
                         )
                 submit_bttn.click()
@@ -559,7 +602,6 @@ class RedditClass:
 
             except TimeoutException:
                 log.error("Failed to write post")
-                break
 
     def red_write_to_file(self, img_link, choice, red_title):
     

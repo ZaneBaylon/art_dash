@@ -1,27 +1,27 @@
 # ------------- Twitter Keys ------------- #
-red_username: "winterblueart"
-red_password: "Showcase2017!"
-upload: []
-post: "post"
+username: "winterblueart"
+password: "Showcase2017!"
+upload: [/Users/zanebaylon/Desktop/dash/images/Bluey.png]
+post: "I'm back from my summer trip and ready to get back to making some art! To all my current commissioners, I'll reach out asap to update you on the status of your orders!"
 
 # ------------- Reddit Keys ------------- #
 red_username: "winterblueart"
 red_password: "Showcase2017!"
 
 # Title [gender/gender] (winterblueart)
-red_title: ""
+red_title: "Mah lemur boy [m] (winterblueart)"
 
 # y/n
 NSFW: "y"
 
 sub_list:                   # All furry
-    r/BreadTapedToTrees: 1  # General nsfw
-    r/Footpaws: 2           # Paw-related
-    r/furry_catwalk: 3      # General
-    r/FurryCommissions: 4   # General commissions
-    r/furryporn: 5          # General nsfw
-    r/gfur: 6               # Gay nsfw
-    r/FurrySoftcore: 7      # Softcore nsfw
-    r/yiff: 8               # Multi-character nsfw
+    "r/BreadTapedToTrees": 1  # General nsfw
+    "r/Footpaws": 2           # Paw-related
+    "r/furry_catwalk": 3      # General
+    "r/FurryCommissions": 4   # General commissions
+    "r/furryporn": 5          # General nsfw
+    "r/gfur": 6               # Gay nsfw
+    "r/FurrySoftcore": 7      # Softcore nsfw
+    "r/yiff": 8               # Multi-character nsfw
 
-choice: []
+choice: [3]

@@ -16,32 +16,29 @@ def parse_flair(red_title):
     listOfWords = strValue.split(ch2, 1)
     strValue = listOfWords[0]
     tag = strValue.lower()
-    keywords = []
+    flair_key = ""
     trs = "translate(., 'ABCDEFGHIJKLMNOPQRSTUVWXYZ', 'abcdefghijklmnopqrstuvwxyz')"
     if 'm' in tag:
         if '/' in tag:
             if 'f' in tag:
                 flair_key = 'contains(' + trs + ", 'straight') or contains(" + trs + ", 'yiff')"
-                return
-                if 'm/m' in tag:
-                    flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'yiff') or " + trs + " = 'male'"
+            if 'm/m' in tag:
+                flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'yiff') or " + trs + " = 'male'"
             else:
                 log.error("Unexpexted '/' in tag")
         else:
             flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'solo') or " + trs + " = 'male'"
-    else:
-        if 'f' in tag:
-            if '/' in tag:
-                if 'f' in tag:
-                    flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'yiff') or contains(" + trs + ", 'female')"
-                else:
-                    if 'm' in tag:
-                        flair_key = 'contains(' + trs + ", 'straight') or contains(" + trs + ", 'yiff')"
-                    else:
-                        log.error("Unexpexted '/' in tag")
+    elif 'f' in tag:
+        if '/' in tag:
+            if 'f/f' in tag:
+                flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'yiff') or contains(" + trs + ", 'female')"
+            if 'm' in tag:
+                flair_key = 'contains(' + trs + ", 'straight') or contains(" + trs + ", 'yiff')"
             else:
-                flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'solo') or contains(" + trs + ", 'female')"
-        return flair_key
+                log.error("Unexpexted '/' in tag")
+        else:
+            flair_key = 'contains(' + trs + ", 'gay') or contains(" + trs + ", 'solo') or contains(" + trs + ", 'female')"
+    return flair_key
 
 
 with open('config.yaml', 'r') as (stream):
